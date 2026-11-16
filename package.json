@@ -5,7 +5,8 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "cowork-mcp": "dist/index.cjs"
+    "cowork-mcp": "dist/index.cjs",
+    "cowork-audit": "dist/audit.cjs"
   },
   "files": [
     "dist",

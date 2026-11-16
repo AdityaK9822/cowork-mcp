@@ -89,6 +89,11 @@ export interface Target {
 export class Roots {
   constructor(private readonly workspaces: readonly Workspace[]) {}
 
+  /** Read-only view for tools and status output. */
+  workspacesSafeView() {
+    return this.workspaces.map((ws) => ({ name: ws.name, root: ws.root, real: ws.real }));
+  }
+
   /**
    * Resolve a tool-supplied path to a verified target, or fail. Relative
    * inputs resolve against each workspace root; absolute and ~ inputs resolve

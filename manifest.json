@@ -1,0 +1,60 @@
+{
+  "dxt_version": "0.1",
+  "name": "cowork-mcp",
+  "display_name": "Cowork Workspace",
+  "version": "0.1.0",
+  "description": "Free Claude-Desktop-native agentic workspace: read, search, and edit files in directories you allow. Sandboxed, audited, undoable. Adapted in part from opencode (MIT).",
+  "author": { "name": "cowork-mcp contributors" },
+  "license": "MIT",
+  "server": {
+    "type": "node",
+    "entrypoint": "dist/index.cjs",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/dist/index.cjs",
+        "${user_config.workspace_1}",
+        "${user_config.workspace_2}",
+        "${user_config.workspace_3}"
+      ],
+      "env": {
+        "COWORK_HOME": "${user_config.data_home}",
+        "COWORK_RG": "${user_config.rg_path}"
+      }
+    }
+  },
+  "user_config": {
+    "workspace_1": {
+      "type": "directory",
+      "title": "Workspace directory",
+      "description": "The directory Claude may read, search, and edit. Browsed with a native folder picker.",
+      "required": true
+    },
+    "workspace_2": {
+      "type": "directory",
+      "title": "Second workspace (optional)",
+      "description": "An additional allowed directory.",
+      "required": false
+    },
+    "workspace_3": {
+      "type": "directory",
+      "title": "Third workspace (optional)",
+      "description": "An additional allowed directory.",
+      "required": false
+    },
+    "data_home": {
+      "type": "directory",
+      "title": "Data directory (optional)",
+      "description": "Where the audit journal and undo snapshots are stored. Defaults to ~/.cowork-mcp.",
+      "required": false,
+      "default": "~/.cowork-mcp"
+    },
+    "rg_path": {
+      "type": "string",
+      "title": "ripgrep path (optional)",
+      "description": "Path to an rg binary. Leave empty to use rg from your PATH; without it a slower built-in search is used.",
+      "required": false
+    }
+  },
+  "keywords": ["files", "workspace", "mcp"]
+}
