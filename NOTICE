@@ -1,0 +1,17 @@
+cowork-mcp
+Copyright 2026 cowork-mcp contributors
+
+This product includes code adapted from the opencode project
+(https://github.com/anomalyco/opencode), MIT licensed, Copyright (c) 2025
+opencode. Adapted modules carry an "// Adapted from opencode (MIT)" header
+listing their source file. The algorithms ported include content paging
+(read-filesystem.ts), exact-match editing with line-ending preservation
+(edit.ts), fuzzy did-you-mean suggestions (read.ts), ripgrep execution
+(ripgrep.ts), path resolution/containment (file-access.ts, fs-util.ts), and
+BOM-preserving writes (file-write.ts).
+
+MIT license text: see LICENSE.
+
+ripgrep is an optional external dependency used from the user's PATH when
+available (MIT, https://github.com/BurntSushi/ripgrep). cowork-mcp never
+downloads anything at runtime.
