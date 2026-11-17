@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:" />
+    <title>Cowork Workspace</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Cowork Workspace</h1>
+      <p id="reason" class="reason">
+        <span class="from-claude">Claude requests:</span>
+        <span id="reason-text"></span>
+      </p>
+    </header>
+
+    <section id="connected">
+      <h2>Connected workspaces</h2>
+      <ul id="workspace-list" class="workspace-list"></ul>
+    </section>
+
+    <section id="connect">
+      <h2>Connect a folder</h2>
+      <div class="row">
+        <div id="dropzone" tabindex="0" aria-label="Drag a folder here to connect it">
+          <div class="drop-icon">⬇</div>
+          <div>Drag a folder here to connect</div>
+          <div class="hint">Symlinks are resolved; folders already inside a workspace are rejected.</div>
+        </div>
+        <button id="browse" type="button">Browse…</button>
+      </div>
+      <p id="candidate" class="candidate"></p>
+    </section>
+
+    <section id="permissions" hidden>
+      <h2>Permissions — <span id="perm-target"></span></h2>
+
+      <label class="check">
+        <input type="checkbox" id="readonly" />
+        Read-only (blocks write and edit)
+      </label>
+
+      <fieldset>
+        <legend>Tool access</legend>
+        <div id="tool-toggles" class="tool-grid"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Deny rules for this workspace (extends the global protection)</legend>
+        <input id="deny-input" type="text" placeholder='e.g. secrets/**  (comma separated)' aria-label="Deny glob patterns" />
+        <div id="deny-list" class="pill-row"></div>
+        <p class="preview" id="dryrun"></p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Allow exceptions (exact paths, no globs)</legend>
+        <input id="allow-input" type="text" placeholder='e.g. secrets/PUBLIC.md  (comma separated)' aria-label="Allow exact paths" />
+        <div id="allow-list" class="pill-row"></div>
+      </fieldset>
+
+      <fieldset class="floor">
+        <legend>Protected floor — not editable</legend>
+        <p id="floor" class="mono"></p>
+      </fieldset>
+    </section>
+
+    <section id="audit">
+      <h2>Recent audit (last 10)</h2>
+      <ul id="audit-list" class="audit-list"></ul>
+    </section>
+
+    <footer>
+      <p class="note">Changes take effect after Claude Desktop restarts this server.</p>
+      <div class="actions">
+        <button id="cancel" type="button">Cancel</button>
+        <button id="apply" type="button" class="primary" disabled>Apply</button>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

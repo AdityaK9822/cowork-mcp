@@ -1,0 +1,96 @@
+:root {
+  --bg: #1b1d21;
+  --panel: #232629;
+  --text: #e8e8e6;
+  --muted: #9a9faa;
+  --accent: #d97757;
+  --ok: #4ade80;
+  --bad: #f87171;
+  --border: #33373d;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font: 13px/1.5 -apple-system, "SF Pro Text", "Segoe UI", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header { padding: 14px 18px 0; }
+h1 { font-size: 15px; margin: 0 0 6px; }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 8px; }
+.reason {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0 0 4px;
+}
+.from-claude { color: var(--accent); font-weight: 600; margin-right: 6px; }
+section { padding: 10px 18px; }
+
+.workspace-list { list-style: none; margin: 0; padding: 0; }
+.workspace-list li {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 12px; margin-bottom: 6px; cursor: pointer;
+}
+.workspace-list li.selected { border-color: var(--accent); }
+.workspace-list .badges { display: flex; gap: 6px; }
+.badge { font-size: 10px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+.badge.warn { color: var(--bad); border-color: var(--bad); }
+
+.row { display: flex; gap: 10px; align-items: stretch; }
+#dropzone {
+  flex: 1; border: 2px dashed var(--border); border-radius: 10px;
+  padding: 18px; text-align: center; color: var(--muted);
+  transition: border-color 120ms, background 120ms;
+}
+#dropzone.armed, #dropzone:focus-visible { border-color: var(--accent); background: rgba(217, 119, 87, 0.06); }
+.drop-icon { font-size: 20px; }
+.hint { font-size: 11px; }
+button {
+  font: inherit; color: var(--text); background: var(--panel);
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; cursor: pointer;
+}
+button:hover:not(:disabled) { border-color: var(--muted); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #181818; font-weight: 600; }
+button:disabled { opacity: 0.4; cursor: default; }
+
+.candidate { min-height: 18px; margin: 8px 0 0; }
+.candidate.ok { color: var(--ok); }
+.candidate.bad { color: var(--bad); }
+
+label.check { display: block; margin-bottom: 10px; }
+fieldset { border: 1px solid var(--border); border-radius: 10px; margin: 0 0 12px; }
+legend { font-size: 11px; color: var(--muted); padding: 0 6px; }
+.tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.tool-grid label { display: flex; gap: 6px; align-items: center; }
+.tool-grid input:disabled + span { color: var(--border); }
+input[type="text"] {
+  width: 100%; font: inherit; color: var(--text);
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px;
+}
+.pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pill { background: var(--panel); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; font-size: 11px; cursor: pointer; }
+.pill:hover { border-color: var(--bad); }
+.preview { color: var(--muted); font-size: 11px; margin: 8px 0 0; }
+.floor { opacity: 0.75; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; margin: 4px 0 0; }
+
+.audit-list { list-style: none; margin: 0; padding: 0; max-height: 110px; overflow: auto; }
+.audit-list li { display: flex; gap: 8px; font-size: 11px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.audit-list .ok { color: var(--ok); }
+.audit-list .denied, .audit-list .error { color: var(--bad); }
+
+footer {
+  margin-top: auto; padding: 12px 18px 16px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.note { color: var(--muted); font-size: 11px; margin: 0; }
+.actions { display: flex; gap: 8px; }

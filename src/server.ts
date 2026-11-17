@@ -6,12 +6,14 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod"
 import type { ToolContext } from "./tools/context.js"
 import { workspaceStatus, workspaceStatusDescription } from "./tools/workspace-status.js"
+import { requestConfigTool, requestConfigDescription, requestConfigInput } from "./tools/config-tool.js"
 import { readTool, readDescription } from "./tools/read.js"
 import { grepTool, grepDescription, globTool, globDescription, listTool, listDescription } from "./tools/search.js"
 import { writeTool, writeDescription } from "./tools/write.js"
 import { editTool, editDescription } from "./tools/edit.js"
 import { ToolFailure } from "./errors.js"
 import { MEDIA_MIMES } from "./core/mime.js"
+import { VERSION } from "./version.js"
 
 const failure = (error: unknown) => ({
   isError: true as const,
@@ -21,7 +23,7 @@ const failure = (error: unknown) => ({
 const text = (value: string) => ({ content: [{ type: "text" as const, text: value }] })
 
 export function createServer(ctx: ToolContext) {
-  const server = new McpServer({ name: "cowork-mcp", version: "0.1.0" })
+  const server = new McpServer({ name: "cowork-mcp", version: VERSION })
 
   server.tool(
     "workspace_status",
@@ -32,6 +34,20 @@ export function createServer(ctx: ToolContext) {
         const status = await workspaceStatus(ctx)
         const { bytes: _bytes, ...rest } = status
         return { content: [{ type: "text" as const, text: "```json\n" + JSON.stringify(rest, null, 2) + "\n```" }] }
+      } catch (error) {
+        return failure(error)
+      }
+    },
+  )
+
+  server.tool(
+    "workspace_request_config",
+    requestConfigDescription,
+    requestConfigInput,
+    async (input) => {
+      try {
+        const outcome = await requestConfigTool(ctx, input)
+        return { content: [{ type: "text" as const, text: "```json\n" + JSON.stringify(outcome, null, 2) + "\n```" }] }
       } catch (error) {
         return failure(error)
       }

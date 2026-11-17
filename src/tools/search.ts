@@ -1,7 +1,7 @@
 import { LIMITS } from "../policy/limits.js"
 import { InvalidGlobError, InvalidPatternError, globSearch, grep, type GrepResult } from "../core/rg.js"
 import { ToolFailure } from "../errors.js"
-import { authorize, runTooled, type ToolContext } from "./context.js"
+import { authorize, runTooled, searchResultBlocked, type ToolContext } from "./context.js"
 
 const fmtMatches = (result: GrepResult, displayRoot: string) => {
   const lines = result.matches.length === 0 ? ["No matches found"] : [`Found ${result.matches.length} matches`]
@@ -43,18 +43,24 @@ export async function grepTool(ctx: ToolContext, input: GrepInput) {
     const limit = Math.min(input.limit ?? LIMITS.DEFAULT_SEARCH_LIMIT, LIMITS.MAX_SEARCH_LIMIT)
     try {
       if (input.path === undefined) {
+        if (ctx.roots.allWorkspacesDisable("grep"))
+          throw new ToolFailure("Blocked: tool 'grep' is not enabled for any workspace.")
         // Search every workspace root; results are prefixed by workspace name.
+        const global = ctx.denylist.summary()
         const outputs: string[] = []
         let total = 0
-        for (const ws of ctx.roots.workspacesSafeView()) {
+        for (const ws of ctx.roots.workspacesGrantedView()) {
+          if (!ws.tools.grep) continue
           const result = await grep({ cwd: ws.real, pattern: input.pattern, ...(input.include ? { include: input.include } : {}), ...(input.literal === undefined ? {} : { literal: input.literal }), ...(input.caseSensitive === undefined ? {} : { caseSensitive: input.caseSensitive }), limit })
           if (result.matches.length === 0) continue
-          outputs.push(`# ${ws.name}\n${fmtMatches(result, ws.name)}`)
-          total += result.matches.length
+          const matches = ws.deny.relative.length === 0 ? result.matches : result.matches.filter((match) => !searchResultBlocked(global, ws.deny, match.path))
+          if (matches.length === 0) continue
+          outputs.push(`# ${ws.name}\n${fmtMatches({ ...result, matches }, ws.name)}`)
+          total += matches.length
         }
         return { text: total === 0 ? "No matches found" : outputs.join("\n\n"), workspace: undefined }
       }
-      const target = await authorize(ctx, input.path)
+      const target = await authorize(ctx, "grep", input.path)
       const isFile = await import("node:fs/promises").then((fs) =>
         fs.stat(target.real).then((stat) => stat.isFile()).catch(() => false),
       )
@@ -94,17 +100,23 @@ export async function globTool(ctx: ToolContext, input: GlobInput) {
     if (input.pattern === "") throw new ToolFailure("Pattern must not be empty")
     const limit = Math.min(input.limit ?? LIMITS.DEFAULT_SEARCH_LIMIT, LIMITS.MAX_SEARCH_LIMIT)
     if (input.path === undefined) {
+      if (ctx.roots.allWorkspacesDisable("glob"))
+        throw new ToolFailure("Blocked: tool 'glob' is not enabled for any workspace.")
+      const global = ctx.denylist.summary()
       const outputs: string[] = []
       let count = 0
-      for (const ws of ctx.roots.workspacesSafeView()) {
+      for (const ws of ctx.roots.workspacesGrantedView()) {
+        if (!ws.tools.glob) continue
         const result = await globSearch({ cwd: ws.real, pattern: input.pattern, limit })
         if (result.files.length === 0) continue
-        outputs.push(`# ${ws.name}\n${result.files.join("\n")}${result.truncated ? "\n[truncated]" : ""}`)
-        count += result.files.length
+        const files = ws.deny.relative.length === 0 ? result.files : result.files.filter((file) => !searchResultBlocked(global, ws.deny, file))
+        if (files.length === 0) continue
+        outputs.push(`# ${ws.name}\n${files.join("\n")}${result.truncated ? "\n[truncated]" : ""}`)
+        count += files.length
       }
       return { text: count === 0 ? "No files match" : outputs.join("\n\n"), workspace: undefined }
     }
-    const target = await authorize(ctx, input.path)
+    const target = await authorize(ctx, "glob", input.path)
     const result = await globSearch({ cwd: target.real, pattern: input.pattern, limit })
     const text = result.files.length === 0 ? "No files match" : result.files.map((file) => `${target.relative === "." ? "" : `${target.relative}/`}${file}`).join("\n")
     return { text: text + (result.truncated ? "\n[truncated]" : ""), workspace: target.workspace.name }
@@ -122,7 +134,7 @@ export interface ListInput {
 
 export async function listTool(ctx: ToolContext, input: ListInput) {
   return runTooled(ctx, "list", { ...input }, async () => {
-    const target = await authorize(ctx, input.path ?? ".")
+    const target = await authorize(ctx, "list", input.path ?? ".")
     const { readPage } = await import("../core/paging.js")
     const result = await readPage(target.real, target.relative, {
       ...(input.offset === undefined ? {} : { offset: input.offset }),

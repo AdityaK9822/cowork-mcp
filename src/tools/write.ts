@@ -24,7 +24,7 @@ export interface WriteOutcome {
 export async function writeTool(ctx: ToolContext, input: WriteInput) {
   return runTooled(ctx, "write", { path: input.path, content: "<content>" }, async (): Promise<WriteOutcome> => {
     const size = assertWritable(input.content)
-    const target = await authorize(ctx, input.path)
+    const target = await authorize(ctx, "write", input.path)
     const previous = await fs.readFile(target.real).catch((error: NodeJS.ErrnoException) => {
       if (error.code === "ENOENT") return undefined
       throw error

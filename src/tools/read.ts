@@ -23,7 +23,7 @@ export interface ReadOutcome {
 
 export async function readTool(ctx: ToolContext, input: ReadInput) {
   return runTooled(ctx, "read", { ...input }, async (): Promise<ReadOutcome> => {
-    const target = await authorize(ctx, input.path)
+    const target = await authorize(ctx, "read", input.path)
     try {
       return await readTarget(ctx, target, input)
     } catch (error) {

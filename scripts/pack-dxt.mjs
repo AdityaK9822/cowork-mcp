@@ -14,6 +14,11 @@ fs.copyFileSync(path.join(root, "manifest.json"), path.join(staging, "manifest.j
 fs.mkdirSync(path.join(staging, "dist"), { recursive: true })
 fs.copyFileSync(path.join(root, "dist", "index.cjs"), path.join(staging, "dist", "index.cjs"))
 for (const file of ["LICENSE", "NOTICE"]) fs.copyFileSync(path.join(root, file), path.join(staging, file))
+// Pick the packaged helper for THIS platform when present (build-gui output).
+for (const entry of fs.readdirSync(path.join(root, "dist")).filter((name) => name.startsWith("cowork-gui-"))) {
+  fs.cpSync(path.join(root, "dist", entry), path.join(staging, "dist", entry), { recursive: true })
+  break
+}
 execFileSync("zip", ["-rq", out, "."], { cwd: staging })
 fs.rmSync(staging, { recursive: true, force: true })
 console.log(`packed ${out} (${(fs.statSync(out).size / 1024 / 1024).toFixed(1)} MB)`)

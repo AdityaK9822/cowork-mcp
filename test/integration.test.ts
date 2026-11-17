@@ -96,7 +96,7 @@ describe("cowork-mcp end-to-end", () => {
     await init()
     const list = await send("tools/list", {})
     const names = list.result.tools.map((tool: any) => tool.name)
-    expect(names).toEqual(["workspace_status", "read", "list", "glob", "grep", "write", "edit"])
+    expect(names).toEqual(["workspace_status", "workspace_request_config", "read", "list", "glob", "grep", "write", "edit"])
   })
 
   test("workspace_status reports the allowlist", async () => {

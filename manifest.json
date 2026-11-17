@@ -2,7 +2,7 @@
   "dxt_version": "0.1",
   "name": "cowork-mcp",
   "display_name": "Cowork Workspace",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Free Claude-Desktop-native agentic workspace: read, search, and edit files in directories you allow. Sandboxed, audited, undoable. Adapted in part from opencode (MIT).",
   "author": { "name": "cowork-mcp contributors" },
   "license": "MIT",
@@ -12,14 +12,14 @@
     "mcp_config": {
       "command": "node",
       "args": [
-        "${__dirname}/dist/index.cjs",
-        "${user_config.workspace_1}",
-        "${user_config.workspace_2}",
-        "${user_config.workspace_3}"
+        "${__dirname}/dist/index.cjs"
       ],
       "env": {
         "COWORK_HOME": "${user_config.data_home}",
-        "COWORK_RG": "${user_config.rg_path}"
+        "COWORK_RG": "${user_config.rg_path}",
+        "COWORK_SEED_1": "${user_config.workspace_1}",
+        "COWORK_SEED_2": "${user_config.workspace_2}",
+        "COWORK_SEED_3": "${user_config.workspace_3}"
       }
     }
   },

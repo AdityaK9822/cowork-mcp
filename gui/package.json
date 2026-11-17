@@ -1,0 +1,17 @@
+{
+  "name": "cowork-gui",
+  "productName": "cowork-gui",
+  "version": "0.2.0",
+  "description": "Configuration window for cowork-mcp: connect workspaces and edit their permissions.",
+  "main": "main.cjs",
+  "private": true,
+  "scripts": {
+    "start": "electron . --dev"
+  },
+  "devDependencies": {
+    "electron": "^32.0.0"
+  },
+  "dependencies": {
+    "picomatch": "^4.0.2"
+  }
+}

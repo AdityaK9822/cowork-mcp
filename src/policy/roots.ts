@@ -67,6 +67,34 @@ export interface Workspace {
   root: string
   /** Realpath of the root; containment is decided against this. */
   real: string
+  /** Per-workspace permissions granted to the model (v2). */
+  grant: WorkspaceGrant
+}
+
+export type ToolName = "read" | "list" | "glob" | "grep" | "write" | "edit"
+
+export const TOOL_NAMES: readonly ToolName[] = ["read", "list", "glob", "grep", "write", "edit"]
+
+export type ToolToggles = Partial<Record<ToolName, boolean>>
+
+/** True = the tool is enabled for this workspace; absent = defaults to true. `read` can never be disabled. */
+export interface WorkspaceGrant {
+  /** Blocks write and edit regardless of the tool toggles. */
+  readOnly: boolean
+  tools: ToolToggles
+  /** Workspace-relative protected-path globs (extends the global floor, never removes it). */
+  denyRelative: string[]
+  /** Exact workspace-relative paths exempt from this workspace's deny globs; no glob characters. */
+  denyAllow: string[]
+}
+
+export const DEFAULT_GRANT: WorkspaceGrant = { readOnly: false, tools: {}, denyRelative: [], denyAllow: [] }
+
+/** The effective toggle for a tool in a workspace: read is always on, every other tool defaults to on. */
+export function toolEnabled(workspaces: Workspace, tool: ToolName): boolean {
+  if (tool === "read") return true
+  if ((tool === "write" || tool === "edit") && workspaces.grant.readOnly) return false
+  return workspaces.grant.tools[tool] ?? true
 }
 
 export interface Target {
@@ -91,7 +119,29 @@ export class Roots {
 
   /** Read-only view for tools and status output. */
   workspacesSafeView() {
-    return this.workspaces.map((ws) => ({ name: ws.name, root: ws.root, real: ws.real }));
+    return this.workspaces.map((ws) => ({ name: ws.name, root: ws.root, real: ws.real }))
+  }
+
+  /** Read-only view including per-workspace permissions, for status output. */
+  workspacesGrantedView() {
+    return this.workspaces.map((ws) => ({
+      name: ws.name,
+      root: ws.root,
+      real: ws.real,
+      readOnly: ws.grant.readOnly,
+      tools: Object.fromEntries(TOOL_NAMES.map((tool) => [tool, toolEnabled(ws, tool)])),
+      deny: { relative: ws.grant.denyRelative, allow: ws.grant.denyAllow },
+    }))
+  }
+
+  /** True when every workspace has this tool disabled — a rootless search would always come back empty by policy. */
+  allWorkspacesDisable(tool: ToolName): boolean {
+    return this.workspaces.length > 0 && this.workspaces.every((ws) => !toolEnabled(ws, tool))
+  }
+
+  /** The effective toggle for one workspace: readOnly blocks write/edit, read is always on. */
+  toolEnabledFor(workspace: Workspace, tool: ToolName): boolean {
+    return toolEnabled(workspace, tool)
   }
 
   /**

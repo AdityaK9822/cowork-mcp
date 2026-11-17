@@ -28,7 +28,7 @@ export async function editTool(ctx: ToolContext, input: EditInput) {
   return runTooled(ctx, "edit", { ...input, oldString: "<old>", newString: "<new>" }, async (): Promise<EditOutcome> => {
     const gate = editInputChecks(input)
     if (gate) throw new ToolFailure(gate)
-    const target = await authorize(ctx, input.path)
+    const target = await authorize(ctx, "edit", input.path)
     const previous = await fs.readFile(target.real).catch(async (error: NodeJS.ErrnoException) => {
       if (error.code === "ENOENT") throw new ToolFailure(await notFoundMessage(input.path, target.real))
       throw error

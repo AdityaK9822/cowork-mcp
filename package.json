@@ -1,6 +1,6 @@
 {
   "name": "cowork-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Free Claude-Desktop-native agentic workspace: a sandboxed, audited, undoable MCP file server. Adapted in part from opencode (MIT).",
   "license": "MIT",
   "type": "module",
@@ -19,7 +19,8 @@
     "build": "node scripts/build.mjs",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
-    "pack:dxt": "npm run build && node scripts/pack-dxt.mjs"
+    "build:gui": "node scripts/build-gui.mjs",
+    "pack:dxt": "npm run build && npm run build:gui && node scripts/pack-dxt.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.13.0",

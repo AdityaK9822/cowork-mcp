@@ -1,5 +1,8 @@
 node_modules/
 dist/
+gui/node_modules/
+gui/*.lock
 *.log
 .DS_Store
 PLAN.md
+cowork-mcp.dxt
